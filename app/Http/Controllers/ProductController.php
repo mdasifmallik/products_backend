@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Image;
 
 class ProductController extends Controller
 {
@@ -13,7 +16,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        //
+        return Product::all();
     }
 
     /**
@@ -34,7 +37,29 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required',
+            'description' => 'required',
+            'price' => 'required',
+            'image' => 'image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $product_id = Product::insertGetId($request->except('image') + [
+            'created_at' => Carbon::now()
+        ]);
+
+        if ($request->hasFile('image')) {
+            $photo = $request->file('image');
+            $photo_name = $product_id . "." . $photo->getClientOriginalExtension();
+            $photo_location = 'public/uploads/product_photos/' . $photo_name;
+            Image::make($photo)->fit(450, 450)->save(base_path($photo_location), 50);
+
+            Product::findOrFail($product_id)->update([
+                'image' => $photo_name
+            ]);
+        }
+
+        return response()->json(['successMessage' => "New Product Created Successfully"]);
     }
 
     /**
