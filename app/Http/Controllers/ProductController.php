@@ -6,6 +6,7 @@ use App\Models\Product;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Image;
+use phpDocumentor\Reflection\PseudoTypes\True_;
 
 class ProductController extends Controller
 {
@@ -96,9 +97,34 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Product $product)
     {
-        //
+        $request->validate([
+            'title' => 'required',
+            'description' => 'required',
+            'price' => 'required',
+            'image' => 'image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $product->update($request->except('_method', 'image'));
+
+        if ($request->hasFile('image')) {
+            if ($product->image != 'default.jpg') {
+                $old_photo_link = 'public/uploads/product_photos/' . $product->image;
+                unlink(base_path($old_photo_link));
+            }
+
+            $photo = $request->file('image');
+            $photo_name = $product->id . "." . $photo->getClientOriginalExtension();
+            $photo_location = 'public/uploads/product_photos/' . $photo_name;
+            Image::make($photo)->fit(450, 450)->save(base_path($photo_location), 50);
+
+            $product->update([
+                'image' => $photo_name
+            ]);
+        }
+
+        return response()->json(['successMessage' => "Product Updated Successfully"]);
     }
 
     /**
@@ -107,8 +133,15 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Product $product)
     {
-        //
+        if ($product->image != 'default.jpg') {
+            $old_photo_link = 'public/uploads/product_photos/' . $product->image;
+            unlink(base_path($old_photo_link));
+        }
+
+        $product->delete();
+
+        return response()->json(['successMessage' => "Product Deleted Successfully"]);
     }
 }
