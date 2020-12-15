@@ -32,6 +32,7 @@ Route::group([
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
     Route::post('me', [AuthController::class, 'me']);
+    Route::get('loginCheck', [AuthController::class, 'loginCheck']);
 });
 
 Route::apiResource('/products', ProductController::class);
