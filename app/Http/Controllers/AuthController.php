@@ -35,7 +35,7 @@ class AuthController extends Controller
         $credentials = request(['email', 'password']);
 
         if (!$token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['message' => 'Credentials not matched.'], 401);
         }
 
         return $this->respondWithToken($token);
@@ -116,10 +116,5 @@ class AuthController extends Controller
             'name' => auth()->user()->name,
             'email' => auth()->user()->email
         ]);
-    }
-
-    public function loginCheck()
-    {
-        return true;
     }
 }

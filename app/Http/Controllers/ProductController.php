@@ -22,7 +22,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return Product::latest()->get();
+        $data =  Product::latest()->paginate(5);
+        return response()->json($data);
     }
 
     /**
