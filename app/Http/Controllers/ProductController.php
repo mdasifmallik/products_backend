@@ -45,9 +45,9 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required',
+            'title' => 'required|max:50',
             'description' => 'required',
-            'price' => 'required',
+            'price' => 'required|numeric|max:99999999',
             'image' => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -101,9 +101,9 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $request->validate([
-            'title' => 'required',
+            'title' => 'required|max:50',
             'description' => 'required',
-            'price' => 'required',
+            'price' => 'required|numeric|min:99999999',
             'image' => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -144,5 +144,17 @@ class ProductController extends Controller
         $product->delete();
 
         return response()->json(['successMessage' => "Product Deleted Successfully"]);
+    }
+
+    public function search(Request $request)
+    {
+        $data = $request->searchText;
+        if (!$data) {
+            $value =  Product::latest()->paginate(5);
+            return response()->json($value);
+        }
+
+        $value = Product::where('title', 'LIKE', '%' . $data . '%')->orWhere('description', 'LIKE', '%' . $data . '%')->paginate(5);
+        return response()->json($value);
     }
 }

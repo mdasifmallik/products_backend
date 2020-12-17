@@ -35,3 +35,4 @@ Route::group([
 });
 
 Route::apiResource('/products', ProductController::class);
+Route::post('/search', [ProductController::class, 'search']);
