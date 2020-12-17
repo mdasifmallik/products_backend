@@ -28,7 +28,10 @@ php artisan config:cache
 php artisan migrate
 ```
 
-### Migrate Database
+### Serve in local environment
 ```
 php artisan serve
 ```
+
+### Run Products Frontend
+After successfully serving this application in your local environment, Run [Products Frontend](https://github.com/mdasifmallik/products_frontend).
